@@ -2016,6 +2016,33 @@ export function drawEffect(ctx, fx) {
     ctx.fillStyle = col;
     ctx.fillText(fx.amount, fx.x + jx, fx.y - rise);
     ctx.globalAlpha = 1;
+  } else if (fx.type === 'build') {
+    // 蓋塔/升級落地：擴散塵環 + 揚塵；升級為金色火花
+    const ease = 1 - (1 - t) * (1 - t);
+    const ring = 10 + ease * 30;
+    ctx.strokeStyle = fx.gold ? `rgba(255,216,120,${(1 - t) * 0.95})` : `rgba(220,200,160,${(1 - t) * 0.85})`;
+    ctx.lineWidth = 5 * (1 - t) + 1;
+    ctx.beginPath(); ctx.arc(fx.x, fx.y + 2, ring, 0, TAU); ctx.stroke();
+    const rnd = mulberry32(fx.gold ? 99 : 42);
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * TAU + rnd() * 0.4;
+      const d = ring * (0.7 + rnd() * 0.4);
+      const px = fx.x + Math.cos(a) * d, py = fx.y + 2 + Math.sin(a) * d * 0.5 - ease * 10;
+      ctx.globalAlpha = (1 - t) * 0.8;
+      ctx.fillStyle = fx.gold ? '#ffe79a' : 'rgba(190,176,150,1)';
+      if (fx.gold) {
+        ctx.beginPath(); ctx.arc(px, py, 2 + rnd() * 1.5, 0, TAU); ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.arc(px, py, 4 + rnd() * 4 + ease * 3, 0, TAU); ctx.fill();
+      }
+    }
+    // 落地瞬間白閃
+    if (t < 0.2) {
+      ctx.globalAlpha = (0.2 - t) * 3;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(fx.x, fx.y, 16, 0, TAU); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   }
 }
 

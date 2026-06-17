@@ -3,6 +3,9 @@ import { TOWERS } from './data.js';
 import { sellRefund, callBonus, starsForLives } from './sim.js';
 
 const ICONS = { archer: '🏹', cannon: '💣', mage: '🔮', frost: '❄️', tesla: '⚡', poison: '☠️' };
+const TARGET_MODES = ['first', 'last', 'strong', 'near'];
+const TARGET_LABEL = { first: '最前', last: '最後', strong: '最強', near: '最近' };
+const TARGET_ICON = { first: '🎯', last: '🐢', strong: '💪', near: '📍' };
 
 export class UI {
   // toScreen: 邏輯座標 → overlay 內 px 的轉換函式
@@ -128,6 +131,17 @@ export class UI {
       x: center.x, y: center.y + R, icon: '💰', label: `賣 +${sellRefund(tower.spent)}`,
       sell: true,
       onTap: () => { g.sell(tower); this.clearSelection(); },
+    });
+    // 目標模式（最前/最後/最強/最近）：點擊循環切換
+    const mode = tower.targetMode || 'first';
+    this.addMenuBtn({
+      x: center.x - R, y: center.y, icon: TARGET_ICON[mode], label: TARGET_LABEL[mode],
+      onTap: () => {
+        const i = TARGET_MODES.indexOf(tower.targetMode || 'first');
+        tower.targetMode = TARGET_MODES[(i + 1) % TARGET_MODES.length];
+        this.clearSelection();
+        this.openTowerMenu(spotIndex, tower);
+      },
     });
   }
 

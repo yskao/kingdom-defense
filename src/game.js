@@ -76,6 +76,7 @@ export class Game {
     this.gold -= cost;
     this.towers.push({ spotIndex, type, level: 0, x, y, cooldown: 0, spent: cost, aim: 0 });
     this.emit('gold');
+    this.effects.push({ type: 'build', x, y, t: 0, dur: 0.5 });
     sfx('build');
     return true;
   }
@@ -91,6 +92,7 @@ export class Game {
     tower.level++;
     tower.spent += cost;
     this.emit('gold');
+    this.effects.push({ type: 'build', x: tower.x, y: tower.y, t: 0, dur: 0.55, gold: true });
     sfx('upgrade');
     return true;
   }
@@ -256,13 +258,20 @@ export class Game {
     return Math.hypot(e.pos.x - t.x, e.pos.y - (t.y - 6)) <= range + e.def.radius;
   }
 
-  // 索敵：射程內最接近城門（dist 最大）者；砲塔跳過飛行單位。
+  // 索敵：射程內依塔的目標模式挑選；砲塔跳過飛行單位。
+  // 模式 first=最前(離城門最近) last=最後 strong=最強(血最多) near=最靠塔
   pickTarget(t, def, lv) {
-    let best = null;
+    let best = null, bestScore = -Infinity;
+    const mode = t.targetMode || 'first';
     for (const e of this.enemies) {
       if (e.def.flying && !def.hitsFlying) continue;
       if (!this.inRange(t, e, lv.range)) continue;
-      if (!best || e.dist > best.dist) best = e;
+      let score;
+      if (mode === 'last') score = -e.dist;
+      else if (mode === 'strong') score = e.hp;
+      else if (mode === 'near') score = -Math.hypot(e.pos.x - t.x, e.pos.y - (t.y - 6));
+      else score = e.dist; // first
+      if (score > bestScore) { bestScore = score; best = e; }
     }
     return best;
   }
