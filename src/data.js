@@ -97,3 +97,17 @@ export const RULES = {
   star3Lives: 18,
   star2Lives: 10,
 };
+
+// 難度：影響怪血量、起始金錢/生命、賞金。普通＝原始數值。
+export const DIFFICULTY = {
+  easy:   { name: '簡單', hpMul: 0.78, goldMul: 1.25, livesAdd: 10, bountyMul: 1.2 },
+  normal: { name: '普通', hpMul: 1.0,  goldMul: 1.0,  livesAdd: 0,  bountyMul: 1.0 },
+  hard:   { name: '困難', hpMul: 1.45, goldMul: 0.9,  livesAdd: -6, bountyMul: 0.9 },
+};
+
+// 星星商店永久升級：每級的加成（index 0 = 未購買）。
+export const SHOP = {
+  gold:  { name: '起始金錢', icon: '💰', costs: [3, 6, 10], add: [0, 0.10, 0.20, 0.32] },   // 起始金錢 +%
+  dmg:   { name: '全塔傷害', icon: '⚔️', costs: [4, 8, 14], add: [0, 0.06, 0.13, 0.22] },   // 全塔傷害 +%
+  lives: { name: '起始生命', icon: '❤️', costs: [3, 6, 10], add: [0, 3, 6, 10] },           // 起始生命 +N
+};

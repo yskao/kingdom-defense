@@ -7,10 +7,16 @@ export const STEP = 1 / 60;
 const FIRST_WAVE_DELAY = 6;
 
 export class Game {
-  constructor(level) {
+  constructor(level, mods = {}) {
     this.level = level;
-    this.gold = level.startGold;
-    this.lives = RULES.startLives;
+    // 難度＋星星商店的綜合加成（由 main.js 算好傳入；預設＝普通、無升級）
+    this.mods = {
+      hpMul: mods.hpMul ?? 1, goldMul: mods.goldMul ?? 1,
+      livesAdd: mods.livesAdd ?? 0, bountyMul: mods.bountyMul ?? 1,
+      dmgMul: mods.dmgMul ?? 1,
+    };
+    this.gold = Math.round(level.startGold * this.mods.goldMul);
+    this.lives = Math.max(1, RULES.startLives + this.mods.livesAdd);
     this.waveIndex = -1;            // 目前進行中的波（-1 = 還沒開始）
     this.countdown = FIRST_WAVE_DELAY; // >0 表示下一波倒數中
     this.enemies = [];
@@ -46,7 +52,7 @@ export class Game {
   spawn(type, pathIndex, startDist = 0, hpScale = 1) {
     const def = ENEMIES[type];
     this._eid = (this._eid ?? 0) + 1;
-    const hp = def.hp * this.level.hpMul * hpScale;
+    const hp = def.hp * this.level.hpMul * hpScale * this.mods.hpMul;
     this.enemies.push({
       type, def, pathIndex,
       hp, maxHp: hp,
@@ -189,8 +195,8 @@ export class Game {
         const speed = t.type === 'cannon' ? 260 : t.type === 'poison' ? 300 : 420;
         this.projectiles.push({
           kind, x: t.x, y: t.y - 14, vx: 0, vy: 0, speed,
-          target, damage: lv.damage, damageType: def.damageType, splash: lv.splash ?? 0,
-          poison: lv.poison ?? 0, poisonDur: lv.poisonDur ?? 0,
+          target, damage: lv.damage * this.mods.dmgMul, damageType: def.damageType, splash: lv.splash ?? 0,
+          poison: (lv.poison ?? 0) * this.mods.dmgMul, poisonDur: lv.poisonDur ?? 0,
         });
       }
     }
@@ -251,7 +257,7 @@ export class Game {
     const chainPts = [origin];
     const hitSet = new Set();
     let current = target;
-    let dmg = lv.damage;
+    let dmg = lv.damage * this.mods.dmgMul;
     for (let i = 0; i < lv.chain && current; i++) {
       hitSet.add(current);
       chainPts.push({ x: current.pos.x, y: current.pos.y });
@@ -298,7 +304,7 @@ export class Game {
     if (flash) e.hitT = 0.12;
     if (e.hp <= 0 && !e.bountyPaid) {
       e.bountyPaid = true;
-      this.gold += e.def.bounty;
+      this.gold += Math.round(e.def.bounty * this.mods.bountyMul);
       this.effects.push({
         type: 'death', x: e.pos.x, y: e.pos.y, t: 0, dur: 0.65,
         color: e.def.color, seed: e.seed * 1000, big: e.type === 'boss',

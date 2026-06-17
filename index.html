@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>王國防線 Kingdom Defense</title>
-<link rel="stylesheet" href="style.css?v=3">
+<title>聖域防線 Sanctum Line</title>
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div id="app">
@@ -14,8 +14,14 @@
   <!-- 關卡選擇 -->
   <div id="screen-select" class="screen">
     <div class="select-scroll">
-      <h1>王國防線</h1>
-      <p class="subtitle">Kingdom Defense</p>
+      <h1>聖域防線</h1>
+      <p class="subtitle">Sanctum Line</p>
+      <div id="difficulty" class="difficulty">
+        <span class="diff-label">難度</span>
+        <button class="diff-btn" data-diff="easy">簡單</button>
+        <button class="diff-btn" data-diff="normal">普通</button>
+        <button class="diff-btn" data-diff="hard">困難</button>
+      </div>
       <div id="level-cards"></div>
       <p class="hint">點關卡進入；在路旁空地建塔，攔下走向城門的敵人！</p>
     </div>

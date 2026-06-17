@@ -1,13 +1,29 @@
 // 進入點：畫面切換、縮放、主迴圈、輸入轉換。
 import { LEVELS } from './levels.js';
-import { TOWERS } from './data.js';
+import { TOWERS, DIFFICULTY, SHOP } from './data.js';
 import { preloadAssets } from './assets.js';
 import { resumeAudio, startMusic, toggleMute, isMuted, sfx } from './sound.js';
 import { buildPath, smoothPath, starsForLives } from './sim.js';
 import { Game, STEP } from './game.js';
 import { UI } from './ui.js';
 import * as R from './render.js';
-import { getStars, recordStars, isUnlocked } from './storage.js';
+import { getStars, recordStars, isUnlocked, getDifficulty, setDifficulty, getShop } from './storage.js';
+
+// 難度＋星星商店升級 → 綜合加成，傳進 Game
+function computeMods() {
+  const diff = DIFFICULTY[getDifficulty()] || DIFFICULTY.normal;
+  const shop = getShop();
+  const gAdd = SHOP.gold.add[shop.gold] ?? 0;
+  const dAdd = SHOP.dmg.add[shop.dmg] ?? 0;
+  const lAdd = SHOP.lives.add[shop.lives] ?? 0;
+  return {
+    hpMul: diff.hpMul,
+    goldMul: diff.goldMul * (1 + gAdd),
+    livesAdd: diff.livesAdd + lAdd,
+    bountyMul: diff.bountyMul,
+    dmgMul: 1 + dAdd,
+  };
+}
 
 // 預先建好路徑結構：折線 → Catmull-Rom 平滑曲線（地圖圖層由 render 內部離屏快取）
 for (const lv of LEVELS) {
@@ -126,11 +142,22 @@ function renderLevelCards() {
   }
 }
 
+function renderDifficulty() {
+  const cur = getDifficulty();
+  document.querySelectorAll('#difficulty .diff-btn').forEach(btn => {
+    btn.classList.toggle('on', btn.dataset.diff === cur);
+  });
+}
+document.querySelectorAll('#difficulty .diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => { sfx('click'); setDifficulty(btn.dataset.diff); renderDifficulty(); });
+});
+
 function showSelect() {
   cancelAnimationFrame(rafId);
   game = null;
   screenGame.hidden = true;
   screenSelect.hidden = false;
+  renderDifficulty();
   renderLevelCards();
 }
 
@@ -140,7 +167,7 @@ function startLevel(level) {
   // 釋放其他關卡的離屏地圖快取，避免高超取樣下記憶體累積
   for (const lv of LEVELS) if (lv !== level) lv._map = null;
   currentLevel = level;
-  game = new Game(level);
+  game = new Game(level, computeMods());
   speed = 1; paused = false; acc = 0;
   btnSpeed.textContent = '1x';
   btnPause.textContent = '⏸';

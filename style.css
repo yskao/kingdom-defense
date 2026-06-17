@@ -49,6 +49,26 @@ html, body {
   text-shadow: 0 2px 4px rgba(0,0,0,.8);
 }
 
+.difficulty {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 22px;
+  padding: 7px 10px; border-radius: 14px;
+  background: rgba(20,14,8,.5); border: 1px solid rgba(255,220,150,.18);
+  box-shadow: 0 4px 14px rgba(0,0,0,.5);
+}
+.diff-label { color: #e8d3a0; font-size: 13px; letter-spacing: 2px; margin-right: 2px; }
+.diff-btn {
+  font: inherit; font-size: 15px; font-weight: 700; color: #d8c49a;
+  padding: 7px 16px; border-radius: 10px; cursor: pointer;
+  background: linear-gradient(#5a4630, #3c2c1a);
+  border: 1px solid rgba(0,0,0,.5); box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+  transition: transform .1s, filter .1s;
+}
+.diff-btn:active { transform: scale(.95); }
+.diff-btn.on {
+  color: #2a1c0c; background: linear-gradient(#ffd97a, #e8a93a);
+  border-color: #b9802a; box-shadow: 0 0 0 2px rgba(255,210,120,.5), 0 3px 8px rgba(0,0,0,.5);
+}
+
 #level-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 760px; }
 .level-card {
   width: 130px; cursor: pointer;
