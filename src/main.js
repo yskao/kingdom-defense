@@ -30,6 +30,9 @@ for (const lv of LEVELS) {
   lv.pathsBuilt = lv.paths.map(p => buildPath(smoothPath(p)));
 }
 
+// 除錯：網址加 ?path 會把怪物實際路線（粉紅線）疊在地圖上，方便檢查路徑
+if (new URLSearchParams(location.search).has('path')) window.__debugPath = true;
+
 const screenSelect = document.getElementById('screen-select');
 const screenGame = document.getElementById('screen-game');
 const canvas = document.getElementById('game-canvas');
