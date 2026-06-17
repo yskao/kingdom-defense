@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>王國防線 Kingdom Defense</title>
+<link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+<div id="app">
+
+  <!-- 關卡選擇 -->
+  <div id="screen-select" class="screen">
+    <div class="select-scroll">
+      <h1>王國防線</h1>
+      <p class="subtitle">Kingdom Defense</p>
+      <div id="level-cards"></div>
+      <p class="hint">點關卡進入；在路旁空地建塔，攔下走向城門的敵人！</p>
+    </div>
+  </div>
+
+  <!-- 遊戲畫面 -->
+  <div id="screen-game" class="screen" hidden>
+    <div id="hud">
+      <button id="btn-back" class="hud-btn">‹ 選關</button>
+      <span class="hud-item">❤️ <b id="hud-lives">20</b></span>
+      <span class="hud-item">💰 <b id="hud-gold">0</b></span>
+      <span class="hud-item">🌊 <b id="hud-wave">0/0</b></span>
+      <span class="hud-spacer"></span>
+      <button id="btn-call" class="hud-btn call" hidden>提前召喚 +<span id="call-bonus">0</span>💰</button>
+      <button id="btn-speed" class="hud-btn">1x</button>
+      <button id="btn-sound" class="hud-btn">🔊</button>
+      <button id="btn-pause" class="hud-btn">⏸</button>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+      <div id="overlay"></div>
+    </div>
+  </div>
+
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

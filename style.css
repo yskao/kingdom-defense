@@ -1,0 +1,226 @@
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  background: #141a26;
+  color: #f0e6d2;
+  font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app { height: 100%; display: flex; flex-direction: column; }
+.screen { height: 100%; display: flex; flex-direction: column; }
+.screen[hidden] { display: none; }
+
+/* ---------- 關卡選擇（手繪叢林背景 + 木質按鈕）---------- */
+#screen-select {
+  position: relative;
+  align-items: center; justify-content: center; padding: 0;
+  background: #2c3a26 url('assets/gui/levels/bg.png') center/cover no-repeat;
+  overflow: auto;
+}
+#screen-select::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(10,16,10,.25) 0%, rgba(8,14,8,.62) 100%);
+  pointer-events: none;
+}
+.select-scroll {
+  position: relative; z-index: 1;
+  width: 100%; min-height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 28px 16px;
+}
+
+#screen-select h1 {
+  font-family: Georgia, "Songti TC", serif;
+  font-size: clamp(38px, 7.5vw, 60px);
+  letter-spacing: 10px;
+  color: #ffd35e;
+  text-shadow:
+    0 2px 0 #9a5a13, 0 3px 0 #7a4e0f, 0 4px 0 #6a420c,
+    0 6px 3px rgba(0,0,0,.7), 0 12px 26px rgba(0,0,0,.7);
+}
+.subtitle {
+  color: #f0e0b0; letter-spacing: 6px; font-size: 13px;
+  margin-bottom: 24px; text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+}
+
+#level-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 760px; }
+.level-card {
+  width: 130px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  transition: transform .12s;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.55));
+}
+.level-card .pad {
+  width: 122px; height: 122px;
+  background: url('assets/gui/levels/btton_empty.png') center/100% 100% no-repeat;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+}
+.level-card:hover { transform: translateY(-4px) scale(1.03); }
+.level-card:active { transform: scale(.95); }
+.level-card.locked { filter: grayscale(.85) brightness(.55) drop-shadow(0 4px 8px rgba(0,0,0,.5)); cursor: default; }
+.level-card.locked:hover { transform: none; }
+.level-card .num {
+  font-family: Georgia, serif;
+  font-size: 42px; font-weight: 800; color: #ffe27a; line-height: 1;
+  text-shadow: 0 2px 0 #6a3d10, 0 3px 4px rgba(0,0,0,.6);
+}
+.level-card .stars { font-size: 17px; letter-spacing: 2px; color: #ffd35e; text-shadow: 0 0 8px rgba(255,211,94,.7), 0 1px 2px rgba(0,0,0,.8); }
+.level-card .stars .off { color: rgba(0,0,0,.32); text-shadow: none; }
+.level-card .name {
+  font-size: 15px; letter-spacing: 1px; color: #fff4dd; font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,.9);
+}
+
+.hint { color: #e8dcc0; font-size: 13px; margin-top: 22px; text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,.9); }
+
+/* ---------- HUD（深木橫條 + 羊皮籌碼）---------- */
+#hud {
+  display: flex; align-items: center; gap: 8px;
+  padding: calc(6px + env(safe-area-inset-top)) 12px 7px;
+  background:
+    linear-gradient(rgba(255,255,255,.05), rgba(0,0,0,.25)),
+    linear-gradient(#3d2c1c, #2a1d12);
+  border-bottom: 2px solid #c79a3b;
+  box-shadow: 0 3px 10px rgba(0,0,0,.5);
+  font-size: 15px;
+  flex-wrap: wrap;
+}
+.hud-item {
+  background: rgba(0,0,0,.32);
+  border: 1px solid rgba(255,211,94,.35);
+  border-radius: 20px;
+  padding: 3px 12px;
+}
+.hud-item b { color: #ffd35e; }
+.hud-spacer { flex: 1; }
+.hud-btn {
+  background: linear-gradient(#8a6a3a, #6a4d26);
+  color: #ffe9b0;
+  border: 1.5px solid #c79a3b;
+  border-radius: 9px;
+  padding: 5px 13px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 2px 5px rgba(0,0,0,.45);
+}
+.hud-btn:active { transform: translateY(1px); box-shadow: inset 0 1px 3px rgba(0,0,0,.4); }
+.hud-btn.call {
+  background: linear-gradient(#c79a3b, #97701f);
+  color: #2a1d0a;
+  animation: callPulse 1.1s ease-in-out infinite;
+}
+@keyframes callPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,211,94,.55); }
+  50% { box-shadow: 0 0 0 7px rgba(255,211,94,0); }
+}
+
+/* ---------- 遊戲畫布 ---------- */
+#canvas-wrap {
+  position: relative; flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, #1d2840 0%, #101624 100%);
+}
+#game-canvas {
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 0 0 3px #c79a3b, 0 0 0 5px #2a1d12, 0 14px 40px rgba(0,0,0,.6);
+}
+#overlay { position: absolute; inset: 0; pointer-events: none; }
+
+/* ---------- 環形選單 ---------- */
+.menu-btn {
+  position: absolute; pointer-events: auto;
+  width: 66px; height: 66px; margin: -33px 0 0 -33px;
+  border-radius: 50%;
+  border: 2px solid #ffd35e;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,.28), rgba(255,255,255,0) 48%),
+    linear-gradient(#8a6a3a, #5e3d22);
+  color: #fff4dd;
+  font-size: 10.5px; line-height: 1.25; font-weight: 600;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.55);
+  animation: menuPop .14s ease-out;
+}
+@keyframes menuPop {
+  from { transform: scale(.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.menu-btn .icon { font-size: 21px; text-shadow: 0 2px 3px rgba(0,0,0,.5); }
+.menu-btn .cost { color: #ffd35e; font-weight: 800; }
+.menu-btn:disabled { filter: grayscale(.85) brightness(.65); }
+.menu-btn.sell { border-color: #e0826e; }
+
+/* ---------- 橫幅與結算 ---------- */
+#banner {
+  position: absolute; left: 50%; top: 16%; transform: translateX(-50%);
+  background:
+    linear-gradient(rgba(255,255,255,.06), rgba(0,0,0,.2)),
+    linear-gradient(#3d2c1c, #2a1d12);
+  border: 1.5px solid #c79a3b;
+  border-radius: 10px;
+  padding: 9px 26px; font-size: 17px; letter-spacing: 1px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.55);
+  pointer-events: none;
+  transition: opacity .4s; opacity: 0; white-space: nowrap;
+}
+
+.endcard {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  background: rgba(8,11,18,.78);
+  pointer-events: auto;
+  animation: fadeIn .3s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.endcard .panel {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 30px 46px;
+  background:
+    linear-gradient(rgba(255,255,255,.05), rgba(0,0,0,.16)),
+    linear-gradient(#4a3623, #332415);
+  border: 2.5px solid #c79a3b;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.35), inset 0 0 0 4.5px rgba(255,220,140,.22), 0 18px 50px rgba(0,0,0,.7);
+  animation: panelPop .28s cubic-bezier(.34,1.5,.64,1);
+}
+@keyframes panelPop {
+  from { transform: scale(.7) translateY(16px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.endcard h2 {
+  font-family: Georgia, "Songti TC", serif;
+  font-size: 34px; letter-spacing: 4px;
+  text-shadow: 0 3px 0 rgba(0,0,0,.55);
+}
+.endcard h2.win { color: #ffd35e; }
+.endcard h2.lose { color: #d97f6e; }
+.endcard .stars { font-size: 46px; letter-spacing: 8px; color: #ffd35e; }
+.endcard .stars .s { animation: starPop .45s backwards; text-shadow: 0 0 16px rgba(255,211,94,.8), 0 3px 2px rgba(0,0,0,.6); }
+.endcard .stars .s:nth-child(2) { animation-delay: .18s; }
+.endcard .stars .s:nth-child(3) { animation-delay: .36s; }
+.endcard .stars .off { color: rgba(255,255,255,.18); }
+@keyframes starPop {
+  from { transform: scale(2.2) rotate(18deg); opacity: 0; }
+  to { transform: scale(1) rotate(0); opacity: 1; }
+}
+.endcard .row { display: flex; gap: 14px; }
+.endcard button {
+  background: linear-gradient(#8a6a3a, #6a4d26);
+  color: #ffe9b0;
+  border: 2px solid #c79a3b;
+  border-radius: 10px;
+  padding: 11px 26px; font-size: 16px; font-weight: 700; letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 3px 8px rgba(0,0,0,.5);
+}
+.endcard button:active { transform: translateY(1px); }
