@@ -81,6 +81,8 @@ html, body {
   position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,.62); backdrop-filter: blur(2px);
 }
+/* hidden 屬性必須蓋過上面的 display:flex，否則商店關不掉 */
+.shop-modal[hidden] { display: none !important; }
 .shop-panel {
   width: min(440px, 90vw); padding: 22px;
   border-radius: 18px; color: #f0e3c4;

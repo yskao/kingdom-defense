@@ -155,10 +155,12 @@ document.querySelectorAll('#difficulty .diff-btn').forEach(btn => {
 // ----- 星星商店 -----
 const shopModal = document.getElementById('shop');
 function renderShop() {
+  const box = document.getElementById('shop-items');
+  const availEl = document.getElementById('shop-avail');
+  if (!box || !availEl) return;
   const shop = getShop();
   const avail = availableStars();
-  document.getElementById('shop-avail').textContent = avail;
-  const box = document.getElementById('shop-items');
+  availEl.textContent = avail;
   box.innerHTML = '';
   for (const key of Object.keys(SHOP)) {
     const def = SHOP[key];
@@ -190,11 +192,12 @@ function renderShop() {
     });
   });
 }
-function openShop() { sfx('click'); renderShop(); shopModal.hidden = false; }
-function closeShop() { sfx('click'); shopModal.hidden = true; }
-document.getElementById('btn-shop').addEventListener('click', openShop);
-document.getElementById('shop-close').addEventListener('click', closeShop);
-shopModal.addEventListener('click', e => { if (e.target === shopModal) closeShop(); });
+function openShop() { sfx('click'); renderShop(); if (shopModal) shopModal.hidden = false; }
+function closeShop() { sfx('click'); if (shopModal) shopModal.hidden = true; }
+// 元素可能因瀏覽器快取到舊 HTML 而不存在；全部加保護，避免整支腳本掛掉
+document.getElementById('btn-shop')?.addEventListener('click', openShop);
+document.getElementById('shop-close')?.addEventListener('click', closeShop);
+shopModal?.addEventListener('click', e => { if (e.target === shopModal) closeShop(); });
 
 function showSelect() {
   cancelAnimationFrame(rafId);
