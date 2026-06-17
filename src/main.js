@@ -7,7 +7,7 @@ import { buildPath, smoothPath, starsForLives } from './sim.js';
 import { Game, STEP } from './game.js';
 import { UI } from './ui.js';
 import * as R from './render.js';
-import { getStars, recordStars, isUnlocked, getDifficulty, setDifficulty, getShop } from './storage.js';
+import { getStars, recordStars, isUnlocked, getDifficulty, setDifficulty, getShop, availableStars, buyUpgrade } from './storage.js';
 
 // 難度＋星星商店升級 → 綜合加成，傳進 Game
 function computeMods() {
@@ -151,6 +151,50 @@ function renderDifficulty() {
 document.querySelectorAll('#difficulty .diff-btn').forEach(btn => {
   btn.addEventListener('click', () => { sfx('click'); setDifficulty(btn.dataset.diff); renderDifficulty(); });
 });
+
+// ----- 星星商店 -----
+const shopModal = document.getElementById('shop');
+function renderShop() {
+  const shop = getShop();
+  const avail = availableStars();
+  document.getElementById('shop-avail').textContent = avail;
+  const box = document.getElementById('shop-items');
+  box.innerHTML = '';
+  for (const key of Object.keys(SHOP)) {
+    const def = SHOP[key];
+    const lvl = shop[key] ?? 0;
+    const maxed = lvl >= 3;
+    const cost = maxed ? null : def.costs[lvl];
+    const eff = key === 'lives'
+      ? `+${def.add[lvl]} 生命`
+      : `+${Math.round(def.add[lvl] * 100)}%`;
+    const pips = [0, 1, 2].map(i => `<span class="pip${i < lvl ? ' on' : ''}"></span>`).join('');
+    const btn = maxed
+      ? `<span class="shop-max">已滿級</span>`
+      : `<button class="shop-buy" data-key="${key}" data-cost="${cost}" ${avail < cost ? 'disabled' : ''}>${cost}★</button>`;
+    const row = document.createElement('div');
+    row.className = 'shop-item';
+    row.innerHTML = `
+      <div class="shop-ic">${def.icon}</div>
+      <div class="shop-info">
+        <div class="shop-name">${def.name} <span class="shop-eff">目前 ${eff}</span></div>
+        <div class="shop-pips">${pips}</div>
+      </div>
+      ${btn}`;
+    box.appendChild(row);
+  }
+  box.querySelectorAll('.shop-buy').forEach(b => {
+    b.addEventListener('click', () => {
+      if (buyUpgrade(b.dataset.key, +b.dataset.cost)) { sfx('upgrade'); renderShop(); }
+      else sfx('click');
+    });
+  });
+}
+function openShop() { sfx('click'); renderShop(); shopModal.hidden = false; }
+function closeShop() { sfx('click'); shopModal.hidden = true; }
+document.getElementById('btn-shop').addEventListener('click', openShop);
+document.getElementById('shop-close').addEventListener('click', closeShop);
+shopModal.addEventListener('click', e => { if (e.target === shopModal) closeShop(); });
 
 function showSelect() {
   cancelAnimationFrame(rafId);

@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>聖域防線 Sanctum Line</title>
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <div id="app">
@@ -21,9 +21,23 @@
         <button class="diff-btn" data-diff="easy">簡單</button>
         <button class="diff-btn" data-diff="normal">普通</button>
         <button class="diff-btn" data-diff="hard">困難</button>
+        <button id="btn-shop" class="shop-open">⭐ 商店</button>
       </div>
       <div id="level-cards"></div>
       <p class="hint">點關卡進入；在路旁空地建塔，攔下走向城門的敵人！</p>
+    </div>
+
+    <!-- 星星商店 -->
+    <div id="shop" class="shop-modal" hidden>
+      <div class="shop-panel">
+        <div class="shop-head">
+          <span class="shop-title">⭐ 星星商店</span>
+          <button id="shop-close" class="shop-close">✕</button>
+        </div>
+        <p class="shop-stars">可用星星 <b id="shop-avail">0</b> ★</p>
+        <div id="shop-items"></div>
+        <p class="shop-hint">破關獲得星星，永久強化每一場戰鬥（升級不影響關卡解鎖）</p>
+      </div>
     </div>
   </div>
 
