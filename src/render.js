@@ -1999,6 +1999,23 @@ export function drawEffect(ctx, fx) {
       ctx.fillRect(px - 1.4, py - 4, 2.8, 8);
       ctx.fillRect(px - 4, py - 1.4, 8, 2.8);
     }
+  } else if (fx.type === 'dmgText') {
+    // 命中跳傷害數字：上升 + 淡出，依傷害大小放大
+    const rise = t * 22;
+    const jx = ((fx.seed * 53) % 14) - 7;          // 水平錯位避免重疊
+    const big = fx.amount >= 30;
+    const pop = t < 0.2 ? 0.7 + t * 1.5 : 1;        // 冒出時的彈跳放大
+    const size = (big ? 17 : 13) * pop;
+    const col = fx.dt === 'magic' ? '#b8e0ff' : '#fff2cf';
+    ctx.globalAlpha = t < 0.6 ? 1 : (1 - t) / 0.4;
+    ctx.font = `bold ${size}px Trebuchet MS, sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(40,20,0,0.92)'; ctx.lineWidth = 3.5;
+    ctx.strokeText(fx.amount, fx.x + jx, fx.y - rise);
+    ctx.fillStyle = col;
+    ctx.fillText(fx.amount, fx.x + jx, fx.y - rise);
+    ctx.globalAlpha = 1;
   }
 }
 

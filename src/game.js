@@ -294,7 +294,17 @@ export class Game {
   }
 
   hurt(e, damage, damageType) {
-    this.applyDamage(e, damageTo(e.def, damage, damageType), true);
+    const dealt = damageTo(e.def, damage, damageType);
+    this.applyDamage(e, dealt, true);
+    // 命中跳傷害數字（手感回饋）
+    const n = Math.round(dealt);
+    if (n >= 1) {
+      this._txtSeed = (this._txtSeed ?? 0) + 1;
+      this.effects.push({
+        type: 'dmgText', x: e.pos.x, y: e.pos.y - e.def.radius - 4,
+        amount: n, dt: damageType, t: 0, dur: 0.6, seed: this._txtSeed,
+      });
+    }
   }
 
   // 集中傷害結算：扣血、閃白、死亡（賞金、特效、史萊姆分裂）。
