@@ -154,8 +154,24 @@ export class Game {
           if (healed) this.effects.push({ type: 'heal', x: e.pos.x, y: e.pos.y, radius: e.def.healRange, t: 0, dur: 0.6 });
         }
       }
+      // Boss 技能：低血狂暴（加速）＋定期召喚小弟
+      if (e.def.summonEvery && e.hp > 0 && !e.reached) {
+        if (e.def.enrageAt && !e.enraged && e.hp <= e.maxHp * e.def.enrageAt) {
+          e.enraged = true;
+          this.effects.push({ type: 'death', x: e.pos.x, y: e.pos.y, t: 0, dur: 0.5, color: '#ff5a2e', seed: e.seed * 7, big: true });
+        }
+        e.summonCd = (e.summonCd ?? e.def.summonEvery) - dt;
+        if (e.summonCd <= 0) {
+          e.summonCd = e.def.summonEvery;
+          for (let i = 0; i < e.def.summonCount; i++) {
+            this.spawn(e.def.summonType, e.pathIndex, Math.max(0, e.dist - 12 - i * 16));
+          }
+          this.effects.push({ type: 'heal', x: e.pos.x, y: e.pos.y, radius: 44, t: 0, dur: 0.5 });
+        }
+      }
       const slow = e.slowT > 0 ? e.slowPct : 0;
-      e.dist += e.def.speed * (1 - slow) * dt;
+      const rage = e.enraged ? e.def.enrageSpeed : 1;
+      e.dist += e.def.speed * (1 - slow) * rage * dt;
       const path = this.level.pathsBuilt[e.pathIndex];
       e.pos = pointAt(path, e.dist);
       if (e.dist >= path.total) {

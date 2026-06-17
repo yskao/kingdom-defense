@@ -86,7 +86,9 @@ export const ENEMIES = {
   slimelet:{ name: '小史萊姆', hp: 32, speed: 64, armor: 0,   bounty: 3,   livesCost: 1, flying: false, radius: 10, color: '#7ad884' },
   // 石像鬼：飛行＋護甲，砲塔打不到又難打穿
   gargoyle:{ name: '石像鬼', hp: 180, speed: 52, armor: 0.4,  bounty: 24,  livesCost: 1, flying: true,  radius: 15, color: '#8693a3' },
-  boss:   { name: '巨魔王', hp: 3200, speed: 22, armor: 0.3,  bounty: 300, livesCost: 5, flying: false, radius: 28, color: '#a93226' },
+  // 巨魔王：低血狂暴（加速）＋定期召喚哥布林小弟
+  boss:   { name: '巨魔王', hp: 3200, speed: 22, armor: 0.3,  bounty: 300, livesCost: 5, flying: false, radius: 28, color: '#a93226',
+            summonEvery: 7, summonType: 'goblin', summonCount: 2, enrageAt: 0.4, enrageSpeed: 1.7 },
 };
 
 export const RULES = {
